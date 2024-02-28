@@ -1,11 +1,13 @@
 import React, { useRef, useEffect } from "react";
 import { useGLTF, Text, MeshTransmissionMaterial } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame, useThree, useLoader } from "@react-three/fiber";
 import { useControls } from "leva";
-import { AudioLoader, AudioListener, Audio, AudioAnalyser } from "three";
+import { AudioLoader, AudioListener, Audio, AudioAnalyser, TextureLoader } from "three";
+import '../scene.css';
 
 export default function Model() {
   const sphereR = useRef();
+  const img = useRef();
   const { viewport, camera } = useThree();
   const analyserRef = useRef(null); // Use a ref to store the analyser
 
@@ -19,7 +21,10 @@ export default function Model() {
       sound.setBuffer(buffer);
       sound.setLoop(true);
       sound.setVolume(0.5);
-      sound.play();
+     
+    sound.play();
+      
+      
     });
 
     const analyser = new AudioAnalyser(sound, 32);
@@ -40,24 +45,29 @@ export default function Model() {
     }
     sphereR.current.rotation.x += 0.005;
     sphereR.current.rotation.y += 0.005;
+
   });
 
+  const texture = useLoader(TextureLoader, '/medias/sohier0.jpg');
+
   const materialProps = useControls({
-    thickness: { value: 0.2, min: 0, max: 3, step: 0.05 },
+    thickness: { value: 0.25, min: 0, max: 3, step: 0.05 },
     roughness: { value: 0, min: 0, max: 1, step: 0.1 },
     transmission: { value: 1, min: 0, max: 1, step: 0.1 },
-    ior: { value: 1.2, min: 1, max: 3, step: 0.1 },
-    chromaticAberration: { value: 0.02, min: 0, max: 1 },
+    ior: { value: 1.1, min: 1, max: 3, step: 0.1 },
+    chromaticAberration: { value: 0.27, min: 0, max: 1 },
     backside: { value: true },
   });
+  
 
   return (
     <group scale={viewport.width / 3.5}>
-      <Text fontSize={0.5} position={[0, 0, -1]} font="fonts\BrokenScript.otf">
-        sohier
-      </Text>
+      <mesh ref={img} position={[0, 0, -0.7]}>
+      <planeGeometry args={[2, 1.5]} /> {/* Ajustez la taille selon vos besoins */}
+      <meshBasicMaterial map={texture} />
+    </mesh>
       <mesh ref={sphereR} position={[0, 0, -.5]}>
-        <boxGeometry />
+        <boxGeometry  />
         <MeshTransmissionMaterial {...materialProps} />
       </mesh>
     </group>
